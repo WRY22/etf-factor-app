@@ -1,73 +1,98 @@
-# React + TypeScript + Vite
+# ETF 因子評測 Dashboard (ETF Factor App)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款以 **Fama-French 五因子模型 (Five-Factor Model)** 為核心的 ETF 風格與因子視覺化分析工具。本應用程式將生硬的量化迴歸斜率，轉化為直觀、易讀的「星等評分」與「風格標籤」，幫助使用者快速理解 ETF 的投資屬性與潛在風險。
 
-Currently, two official plugins are available:
+## ✨ 核心特色
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **量化指標視覺化**：將市場 Beta、規模 (SMB)、價值 (HML_O)、獲利 (RMW)、投資 (CMA) 等因子轉換為 1~5 顆星等與明確文字標籤。
+- **高風險死穴警告**：自動偵測「持有大量低獲利卻過度投資的小型股」等模型無法解釋的高風險組合，給予明確的紅色警示。
+- **防呆與容錯設計**：嚴格的資料型別驗證，任何來自 API 的缺失值 (`null`, `undefined`, `NaN`) 均會被安全攔截並顯示「暫無數據」，確保 UI 不崩潰。
+- **深色金融美學介面**：採用類似專業交易所的 Dark Mode 玻璃擬態 (Glassmorphism) 設計風格，提供極佳的沉浸式體驗。
 
-## React Compiler
+## 🛠 技術堆疊
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **前端框架**：React 18
+- **開發語言**：TypeScript (嚴格型別，啟用 `verbatimModuleSyntax`)
+- **建置工具**：Vite
+- **樣式工具**：Tailwind CSS v4
+- **圖示庫**：SVG 內建設計（無依賴外部 Icon 套件）
 
-## Expanding the ESLint configuration
+## 📦 快速開始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. 系統需求
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+請確保您的環境已安裝 Node.js 18 或以上版本。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 2. 安裝與啟動
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# 1. 進入專案目錄
+cd etf-factor-app
+
+# 2. 安裝依賴套件
+npm install
+
+# 3. 啟動開發伺服器
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+啟動後，請在瀏覽器開啟 `http://localhost:5173/`。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📊 因子評分邏輯說明
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+本系統的核心在於將原始的迴歸斜率數值，轉換為易讀的星等 (1~5 顆星) 與狀態標籤。所有的核心邏輯皆封裝於 `src/utils/` 中，且擁有完整的單元測試適應性。
+
+### 1. 市場與規模 (Market & Size)
+- **市場 Beta (mkt)**：衡量對大盤的敏感度。儀表板分為：低敏感 (< 0.8)、接近市場 (0.8~1.2)、高敏感 (> 1.2)。
+- **規模因子 (SMB)**：正值偏向中小型股，負值偏向大型權值股。
+
+### 2. 基本面 (Profitability & Investment)
+- **獲利能力 (RMW)**：正值代表強獲利能力。數值越高星等越高，負值一律給予 1 顆星。
+- **投資因子 (CMA)**：**正向評分邏輯**。正值代表保守投資與低資產擴張，星等較高。強烈負值（< -0.3）代表積極擴張的高風險暴露，不論多低皆只給 1 顆星。
+
+### 3. 評價與動能 (Value & Momentum)
+- **價值因子 (HML_O)**：正值代表便宜的價值股，數值越高星等越高。
+- **動能分數 (Momentum)**：評估近期漲勢延續性（範圍 0~100 分），越高分星等越高。
+
+### 4. 風險防禦 (Defensive)
+- **歷史波動度 (Volatility)**：**反向評分邏輯**。波動度越低，防禦星等越高。年化波動大於 30% 者僅給予 1 顆星。
+
+## 🚨 高風險死穴判定 (Lethal Warning)
+
+系統會即時檢測 ETF 是否隱含致命缺陷。當以下 **三個條件同時滿足** 時，將會觸發頂部的紅色骷髏警告卡片：
+
+1. `SMB > 0.2`（明顯偏向小型股）
+2. `RMW < -0.3`（嚴重低獲利能力）
+3. `CMA < -0.3`（高度積極投資與擴張）
+
+這類組合通常在長期回測中表現極差，屬於因子模型無法提供超額報酬的高危險區域，因此應用程式會明確向使用者提出警示。
+
+## 📁 專案架構
+
+```text
+src/
+├── components/          # 視覺 UI 元件 (無金融運算邏輯，負責純渲染)
+│   ├── BetaGauge.tsx        # 市場 Beta 儀表板
+│   ├── EmptyValue.tsx       # 缺值防呆顯示文字
+│   ├── FactorPanel.tsx      # 玻璃擬態區塊容器
+│   ├── LethalWarningBadge.tsx # 高風險警告卡片
+│   ├── MetricRow.tsx        # 單列指標資料列
+│   └── StarRating.tsx       # 1-5 顆星星等元件
+├── data/                # 測試資料
+│   └── mockEtfData.ts       # 包含穩健、高風險、缺值三種測試情境
+├── pages/               # 頁面級元件
+│   └── Dashboard.tsx        # ETF 評測主畫板，組合所有邏輯與元件
+├── types/               # TypeScript 型別定義
+│   └── etf.ts               # 定義 API 合約與 UI 防呆輸入型別
+├── utils/               # 核心邏輯函式庫 (Pure Functions，無副作用)
+│   ├── factorLabelUtils.ts  # 數值轉文字標籤邏輯與死穴判斷
+│   ├── factorRatingUtils.ts # 數值轉星等評分邏輯
+│   └── numberGuards.ts      # 嚴格數值檢驗與防呆工具
+├── App.tsx              # 根元件 (提供測試資料切換導覽列)
+├── main.tsx             # React 進入點
+└── index.css            # Tailwind CSS v4 與全域暗色系交易所風格佈景
 ```
+
+## 💡 免責聲明
+
+本應用程式（包含 UI 顯示之所有星等與文字）**僅為量化因子暴露之視覺化分析，絕對不構成任何投資買賣建議**。過往績效與因子特徵不保證未來回報，投資人應自行承擔投資風險。
