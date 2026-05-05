@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ETF Factor Dashboard — Global Design System
+   Visual direction: professional fintech / dark exchange UI
+   ============================================================ */
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  /* Typography */
+  --font-sans: "Inter", "SF Pro Display", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  /* Dashboard surfaces */
+  --color-bg:           #050a12;
+  --color-bg-elevated:  #080f1c;
+  --color-panel:        rgba(10, 18, 35, 0.85);
+  --color-panel-hover:  rgba(14, 24, 46, 0.90);
+
+  /* Borders */
+  --color-border:       rgba(255, 255, 255, 0.07);
+  --color-border-focus: rgba(56, 189, 248, 0.60);
+
+  /* Accent — cyan/blue (trust, precision, performance) */
+  --color-accent:       #38bdf8;
+  --color-accent-dim:   rgba(56, 189, 248, 0.15);
+  --color-accent-glow:  rgba(56, 189, 248, 0.25);
+
+  /* Semantic colours */
+  --color-success:      #22d3a0;
+  --color-success-dim:  rgba(34, 211, 160, 0.12);
+  --color-warning:      #f59e0b;
+  --color-warning-dim:  rgba(245, 158, 11, 0.12);
+  --color-danger:       #f43f5e;
+  --color-danger-dim:   rgba(244, 63, 94, 0.12);
+  --color-danger-glow:  rgba(244, 63, 94, 0.30);
+
+  /* Text hierarchy */
+  --color-text-primary: #e2e8f0;
+  --color-text-muted:   #64748b;
+  --color-text-subtle:  #334155;
+
+  /* Shadows & glows */
+  --shadow-panel:   0 4px 24px rgba(0, 0, 0, 0.50);
+  --shadow-card:    0 2px 12px rgba(0, 0, 0, 0.40);
+  --glow-accent:    0 0 20px rgba(56, 189, 248, 0.15);
+  --glow-danger:    0 0 24px rgba(244, 63, 94, 0.25);
+
+  /* Grid line colour for exchange background */
+  --color-grid-line: rgba(56, 189, 248, 0.04);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ── Base Reset & Typography ──────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow-x: hidden;
+
+  /* Subtle exchange-grid background */
+  background-image:
+    linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+#root {
+  min-height: 100dvh;
+  isolation: isolate;
+}
+
+/* ── Headings ─────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+h1 { font-size: clamp(1.5rem, 4vw, 2.25rem); font-weight: 700; }
+h2 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); font-weight: 600; }
+h3 { font-size: 1.125rem; font-weight: 600; }
+
+p { margin: 0; }
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-elevated);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-focus);
+  border-radius: 3px;
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
+}
+
+/* ── Text Selection ───────────────────────────────────────── */
+::selection {
+  background-color: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+/* ── Focus Accessibility ──────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Utility Classes ──────────────────────────────────────── */
+
+/* App-level shell container */
+.app-shell {
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Glassmorphism panel — used by FactorPanel and similar cards */
+.glass-panel {
+  background: var(--color-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-panel);
+  transition: box-shadow var(--transition-normal),
+              background var(--transition-normal);
+}
+
+.glass-panel:hover {
+  background: var(--color-panel-hover);
+  box-shadow: var(--shadow-panel), var(--glow-accent);
+}
+
+/* Exchange-style repeating grid overlay (apply to full-bleed sections) */
+.exchange-grid-bg {
+  background-image:
+    linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Muted secondary text */
+.text-muted {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+/* Danger glow — applied to high-risk warning elements */
+.danger-glow {
+  box-shadow: var(--glow-danger);
+}
